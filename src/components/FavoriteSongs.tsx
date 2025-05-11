@@ -21,22 +21,25 @@ const songs: Song[] = [
     id: 'meanttobe',
     title: 'Meant to Be',
     artist: 'bbno$',
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/51/c1/a0/51c1a014-5219-3769-9c53-283546a93604/075679758280.jpg/200x200bb.jpg',
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/bb/69/fa/bb69fa77-f1d3-4620-608f-252f3f35c524/mzaf_13174075927173936759.plus.aac.p.m4a',
+    // Data from example HTML (eat ya veggies album)
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/06/53/0f/06530f5e-28a1-512b-660d-617fda70a102/193436403337.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/17/8a/3c/178a3c47-d40d-cf58-1b55-572e0d1a7523/mzaf_7500688799019275422.plus.aac.p.m4a',
     dataAiHint: 'hiphop rap',
   },
   {
     id: 'finelemondemon',
     title: 'Fine',
     artist: 'Lemon Demon',
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f4/f3/e2/f4f3e22a-a70c-452c-87a2-706a3d0010c5/artwork.jpg/200x200bb.jpg',
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/e0/73/95/e07395d7-212a-9554-6d67-7860c0553558/mzaf_11970757684010349741.plus.aac.p.m4a',
+    // Data from example HTML (View-Monster album)
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3d/7a/0a/3d7a0af0-ffb9-b2c7-5c5e-8abdf2001cb4/786851150827.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/cd/cd/7ecdcd73-7c2b-de52-e575-c4d74e31f2e7/mzaf_14306633859304567186.plus.aac.p.m4a',
     dataAiHint: 'indie pop',
   },
   {
     id: 'notallowedtvgirl',
     title: 'Not Allowed',
     artist: 'TV Girl',
+    // Retained current data as example HTML data was incorrect for this song title/album
     imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/00/ac/93/00ac9300-92f7-503d-3b22-93d027779274/859716206028.jpg/200x200bb.jpg',
     previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/53/93/b0/5393b0c4-f09f-a01b-a9b2-a24b87e069f1/mzaf_12007878714715764887.plus.aac.p.m4a',
     dataAiHint: 'lofi indie',
@@ -45,6 +48,7 @@ const songs: Song[] = [
     id: 'machinelovejamiepage',
     title: 'Machine Love',
     artist: 'Jamie Page',
+    // Retained current data as example HTML data was for a different song
     imageUrl: 'https://i1.sndcdn.com/artworks-000101830900-l9z2v7-t500x500.jpg',
     previewUrl: null, 
     dataAiHint: 'synthwave retro game-ost',
@@ -54,7 +58,7 @@ const songs: Song[] = [
 interface SongCardProps {
   song: Song;
   playingSongId: string | null;
-  onPlayPauseToggle: (songId: string) => void;
+  onPlayPauseToggle: (songId: string, audioRef: React.RefObject<HTMLAudioElement>) => void;
 }
 
 const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseToggle }) => {
@@ -64,16 +68,13 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseTog
   useEffect(() => {
     const audioElement = audioRef.current;
     if (audioElement) {
-      if (isPlaying) {
+      if (isPlaying && song.previewUrl) {
         audioElement.play().catch(error => {
-          console.error(`Error playing '${song.title}': ${error.message}`, error);
-          // Optionally, if play fails, inform parent to reset playing state
-          // onPlayPauseToggle(null); // This might cause a loop if not handled carefully
+          console.error(`Error playing '${song.title}': ${(error as Error).message}`, error);
         });
       } else {
         audioElement.pause();
-        // Check if seeking to avoid error when setting currentTime
-        if (!audioElement.seeking) {
+         if (!audioElement.seeking && audioElement.currentTime > 0) { // Check currentTime before resetting
             try {
                 audioElement.currentTime = 0; 
             } catch (e) {
@@ -82,11 +83,11 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseTog
         }
       }
     }
-  }, [isPlaying, song.title]); // song.title for console logging context
+  }, [isPlaying, song.title, song.previewUrl]);
 
   const handlePlayButtonClick = () => {
     if (song.previewUrl) {
-      onPlayPauseToggle(song.id);
+      onPlayPauseToggle(song.id, audioRef);
     }
   };
   
@@ -135,12 +136,43 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseTog
 
 const FavoriteSongs: React.FC = () => {
   const [playingSongId, setPlayingSongId] = useState<string | null>(null);
+  const [currentAudioElement, setCurrentAudioElement] = useState<HTMLAudioElement | null>(null);
 
-  const handlePlayPauseToggle = (songId: string) => {
+  const handlePlayPauseToggle = (songId: string, audioRef: React.RefObject<HTMLAudioElement>) => {
+    const newAudioElement = audioRef.current;
+
     if (playingSongId === songId) {
-      setPlayingSongId(null); // If current playing song is clicked, stop it.
+      // If current playing song is clicked, stop it.
+      if (currentAudioElement) {
+        currentAudioElement.pause();
+        if(!currentAudioElement.seeking && currentAudioElement.currentTime > 0){
+            try {
+                currentAudioElement.currentTime = 0;
+            } catch(e){
+                console.warn(`Could not reset currentTime: ${(e as Error).message}`);
+            }
+        }
+      }
+      setPlayingSongId(null);
+      setCurrentAudioElement(null);
     } else {
-      setPlayingSongId(songId); // Else, play the new song.
+      // Stop any currently playing song
+      if (currentAudioElement) {
+        currentAudioElement.pause();
+         if(!currentAudioElement.seeking && currentAudioElement.currentTime > 0){
+            try {
+                currentAudioElement.currentTime = 0;
+            } catch(e){
+                console.warn(`Could not reset currentTime: ${(e as Error).message}`);
+            }
+        }
+      }
+      // Play the new song
+      if (newAudioElement) {
+        newAudioElement.play().catch(error => console.error("Error playing audio:", error));
+      }
+      setPlayingSongId(songId);
+      setCurrentAudioElement(newAudioElement);
     }
   };
 
