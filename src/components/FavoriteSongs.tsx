@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -21,7 +22,6 @@ const songs: Song[] = [
     id: 'meanttobe',
     title: 'Meant to Be',
     artist: 'bbno$',
-    // Data from example HTML (eat ya veggies album)
     imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/06/53/0f/06530f5e-28a1-512b-660d-617fda70a102/193436403337.jpg/200x200bb.jpg',
     previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/17/8a/3c/178a3c47-d40d-cf58-1b55-572e0d1a7523/mzaf_7500688799019275422.plus.aac.p.m4a',
     dataAiHint: 'hiphop rap',
@@ -30,7 +30,6 @@ const songs: Song[] = [
     id: 'finelemondemon',
     title: 'Fine',
     artist: 'Lemon Demon',
-    // Data from example HTML (View-Monster album)
     imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3d/7a/0a/3d7a0af0-ffb9-b2c7-5c5e-8abdf2001cb4/786851150827.jpg/200x200bb.jpg',
     previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/cd/cd/7ecdcd73-7c2b-de52-e575-c4d74e31f2e7/mzaf_14306633859304567186.plus.aac.p.m4a',
     dataAiHint: 'indie pop',
@@ -39,18 +38,16 @@ const songs: Song[] = [
     id: 'notallowedtvgirl',
     title: 'Not Allowed',
     artist: 'TV Girl',
-    // Retained current data as example HTML data was incorrect for this song title/album
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/00/ac/93/00ac9300-92f7-503d-3b22-93d027779274/859716206028.jpg/200x200bb.jpg',
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/53/93/b0/5393b0c4-f09f-a01b-a9b2-a24b87e069f1/mzaf_12007878714715764887.plus.aac.p.m4a',
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f7/48/1b/f7481be7-f879-64de-fccb-9a464aa7506f/190394310509_cover.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/ac/ba/37/acba3754-64d0-6da8-b651-63591fc26231/mzaf_13624346006752988014.plus.aac.p.m4a',
     dataAiHint: 'lofi indie',
   },
   {
     id: 'machinelovejamiepage',
     title: 'Machine Love',
     artist: 'Jamie Page',
-    // Retained current data as example HTML data was for a different song
-    imageUrl: 'https://i1.sndcdn.com/artworks-000101830900-l9z2v7-t500x500.jpg',
-    previewUrl: null, 
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a0/93/33/a0933384-61e2-ec73-796f-2c77fbd59ea0/artwork.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c5/c2/44/c5c2441a-bc78-c61d-cb13-1b6546a698d0/mzaf_345667230985168803.plus.aac.p.m4a',
     dataAiHint: 'synthwave retro game-ost',
   },
 ];
@@ -69,12 +66,16 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseTog
     const audioElement = audioRef.current;
     if (audioElement) {
       if (isPlaying && song.previewUrl) {
+        // Ensure audio element has a src before playing
+        if (audioElement.src !== song.previewUrl) {
+            audioElement.src = song.previewUrl;
+        }
         audioElement.play().catch(error => {
           console.error(`Error playing '${song.title}': ${(error as Error).message}`, error);
         });
       } else {
         audioElement.pause();
-         if (!audioElement.seeking && audioElement.currentTime > 0) { // Check currentTime before resetting
+         if (!audioElement.seeking && audioElement.currentTime > 0) { 
             try {
                 audioElement.currentTime = 0; 
             } catch (e) {
@@ -93,6 +94,7 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseTog
   
   return (
     <Card className="bg-card hover:shadow-primary/20 hover:shadow-lg transition-shadow duration-300 w-full">
+      {/* Conditionally render audio element only if previewUrl exists and is different from current src to avoid unnecessary re-renders/reloads */}
       {song.previewUrl && <audio ref={audioRef} src={song.previewUrl} preload="metadata" />}
       <CardHeader className="flex flex-row items-center gap-4 p-4">
         <div className="relative w-20 h-20">
@@ -168,7 +170,7 @@ const FavoriteSongs: React.FC = () => {
         }
       }
       // Play the new song
-      if (newAudioElement) {
+      if (newAudioElement && newAudioElement.src) { // Check if src is set
         newAudioElement.play().catch(error => console.error("Error playing audio:", error));
       }
       setPlayingSongId(songId);
@@ -196,3 +198,4 @@ const FavoriteSongs: React.FC = () => {
 };
 
 export default FavoriteSongs;
+
