@@ -1,6 +1,6 @@
 'use client';
 import type React from 'react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import AppHeader from '@/components/AppHeader';
 import ProfileSection from '@/components/ProfileSection';
 import FavoriteGames from '@/components/FavoriteGames';
@@ -9,19 +9,61 @@ import ArtworkShowcase from '@/components/ArtworkShowcase';
 import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
-  const artworkRef = useRef<HTMLElement>(null);
+  const homeSectionRef = useRef<HTMLDivElement>(null);
+  const artworkRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'home' | 'citri'>('home');
+
+  useEffect(() => {
+    const artworkObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActiveTab('citri');
+        } else {
+          // If artwork is not intersecting, 'home' tab should be active.
+          // This handles scrolling past artwork in both directions.
+          setActiveTab('home');
+        }
+      },
+      {
+        threshold: 0.1, // 10% of artwork section visible to be considered active
+        // rootMargin can be used to adjust detection sensitivity, e.g., trigger earlier/later
+        // Example: rootMargin: "-10% 0px -10% 0px" would shrink the detection viewport by 10% top/bottom
+      }
+    );
+
+    if (artworkRef.current) {
+      artworkObserver.observe(artworkRef.current);
+    }
+
+    return () => {
+      if (artworkRef.current) {
+        artworkObserver.unobserve(artworkRef.current);
+      }
+    };
+  }, []);
+
+  const scrollToHome = () => {
+    homeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const scrollToArtwork = () => {
-    artworkRef.current?.scrollIntoView({ behavior: 'smooth' });
+    artworkRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-background text-foreground font-sans">
       <div className="w-full max-w-[1200px] mx-auto px-4">
-        <AppHeader onCitriTabClick={scrollToArtwork} />
+        <AppHeader
+          activeTab={activeTab}
+          onHomeTabClick={scrollToHome}
+          onCitriTabClick={scrollToArtwork}
+        />
         
-        <main className="mt-12 flex flex-col gap-12">
-          <ProfileSection />
+        {/* Increased margin-top to ensure content isn't hidden by the sticky header. Adjust as needed based on header height. */}
+        <main className="mt-24 flex flex-col gap-12"> 
+          <div ref={homeSectionRef}>
+            <ProfileSection />
+          </div>
           
           <Separator className="bg-border/50 my-8" />
 
@@ -35,8 +77,7 @@ export default function Home() {
           
           <Separator className="bg-border/50 my-8" />
           
-          {/* Assign ref to the ArtworkShowcase section's wrapper if needed, or to the section itself */}
-          <div ref={artworkRef as React.RefObject<HTMLDivElement>}>
+          <div ref={artworkRef}>
             <ArtworkShowcase />
           </div>
         </main>
