@@ -45,9 +45,9 @@ const songs: Song[] = [
     id: 'machinelovejamiepage',
     title: 'Machine Love',
     artist: 'Jamie Page',
-    imageUrl: 'https://picsum.photos/200/200', // Placeholder, actual art is harder to find in standard format
-    previewUrl: null, // Preview URL is also hard to find
-    dataAiHint: 'synthwave retro',
+    imageUrl: 'https://i1.sndcdn.com/artworks-000101830900-l9z2v7-t500x500.jpg', // Updated image
+    previewUrl: null, 
+    dataAiHint: 'synthwave retro game-ost',
   },
 ];
 
@@ -68,6 +68,7 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause })
         audioElement.play().catch(error => console.error("Error playing audio:", error));
       } else {
         audioElement.pause();
+        audioElement.currentTime = 0; // Reset audio to beginning when paused
       }
     }
   }, [isPlaying]);
@@ -80,7 +81,7 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause })
   
   return (
     <Card className="bg-card hover:shadow-primary/20 hover:shadow-lg transition-shadow duration-300 w-full">
-      {song.previewUrl && <audio ref={audioRef} src={song.previewUrl} />}
+      {song.previewUrl && <audio ref={audioRef} src={song.previewUrl} preload="metadata" />}
       <CardHeader className="flex flex-row items-center gap-4 p-4">
         <div className="relative w-20 h-20">
           <Image
@@ -129,14 +130,28 @@ const FavoriteSongs: React.FC = () => {
     // Pause currently playing song if different
     if (playingSongId && playingSongId !== songId) {
       const currentAudioRef = audioRefs.current[playingSongId];
-      currentAudioRef?.current?.pause();
+      if (currentAudioRef?.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0; // Reset previous song
+      }
     }
     
     // Toggle play/pause for the clicked song
     if (playingSongId === songId) {
-      setPlayingSongId(null); // Pause
+      // If clicking the currently playing song, pause it
+      const currentAudioElement = audioRef.current;
+      if (currentAudioElement) {
+        currentAudioElement.pause();
+        currentAudioElement.currentTime = 0;
+      }
+      setPlayingSongId(null); 
     } else {
-      setPlayingSongId(songId); // Play
+      // If clicking a new song, play it
+      const newAudioElement = audioRef.current;
+      if (newAudioElement) {
+        newAudioElement.play().catch(error => console.error("Error playing audio:", error));
+      }
+      setPlayingSongId(songId); 
     }
     audioRefs.current[songId] = audioRef;
   };

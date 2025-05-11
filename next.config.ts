@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'i1.sndcdn.com', // Added for SoundCloud images
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };
