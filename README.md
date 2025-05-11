@@ -1,5 +1,3 @@
-# Firebase Studio
+Actually reading ts is crazy work 
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+also my first full stack almost working web proj
