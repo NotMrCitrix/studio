@@ -80,8 +80,8 @@ export default function Home() {
           onCitriTabClick={scrollToArtwork}
         />
         
-        {/* Reduced margin-top to move content up */}
-        <main className="mt-20 flex flex-col gap-12"> 
+        {/* Further reduced margin-top to move content up */}
+        <main className="mt-12 flex flex-col gap-12"> 
           <div ref={homeSectionRef}>
             <ProfileSection />
           </div>
