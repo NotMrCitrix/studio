@@ -6,7 +6,6 @@ import ProfileSection from '@/components/ProfileSection';
 import FavoriteGames from '@/components/FavoriteGames';
 import FavoriteSongs from '@/components/FavoriteSongs';
 import ArtworkShowcase from '@/components/ArtworkShowcase';
-import SongFinder from '@/components/SongFinder';
 import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
@@ -40,10 +39,6 @@ export default function Home() {
           <div ref={artworkRef as React.RefObject<HTMLDivElement>}>
             <ArtworkShowcase />
           </div>
-
-          <Separator className="bg-border/50 my-8" />
-          
-          <SongFinder />
         </main>
 
         <footer className="py-12 mt-16 text-center">
