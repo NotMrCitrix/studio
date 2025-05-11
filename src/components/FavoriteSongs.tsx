@@ -13,36 +13,41 @@ interface Song {
   artist: string;
   imageUrl: string;
   previewUrl: string | null;
+  dataAiHint?: string;
 }
 
 const songs: Song[] = [
-  { 
-    id: 'imdoingfine', 
-    title: "I'm Doing Fine", 
-    artist: 'Marino', 
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/aa/48/80/aa4880ee-9fc7-4156-c1b9-b2c59c98b957/7300343008392.jpg/200x200bb.jpg', 
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/97/fa/da/97fada7f-e580-1199-bba3-373dbff84ec6/mzaf_12879073499565325787.plus.aac.p.m4a' 
+  {
+    id: 'lovelikeyou',
+    title: 'Love Like You',
+    artist: 'Rebecca Sugar (Steven Universe)',
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a0/19/a9/a019a95f-92bb-8547-a721-b8757a90e400/859778520570.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview112/v4/8c/37/e9/8c37e930-3a86-711a-1b93-93a4f7a662d2/mzaf_1271683509779878051.plus.aac.p.m4a',
+    dataAiHint: 'soundtrack emotional',
   },
-  { 
-    id: 'fromthestart', 
-    title: 'From the Start', 
-    artist: 'Good Kid', 
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/f4/11/f0/f411f0cb-e16d-b33d-044b-37ebddb33e04/0.jpg/200x200bb.jpg', 
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/4e/05/33/4e0533c3-3f93-1771-a7e1-0d02d16b33a6/mzaf_7701577053524228574.plus.aac.p.m4a'
+  {
+    id: 'finelemondemon',
+    title: 'Fine',
+    artist: 'Lemon Demon',
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f4/f3/e2/f4f3e22a-a70c-452c-87a2-706a3d0010c5/artwork.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/e0/73/95/e07395d7-212a-9554-6d67-7860c0553558/mzaf_11970757684010349741.plus.aac.p.m4a',
+    dataAiHint: 'indie pop',
   },
-  { 
-    id: 'coffee', 
-    title: 'Coffee', 
-    artist: "Jack Stauber's Micropop", 
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ff/cb/54/ffcb54b8-7fdc-fbc6-ac8d-b3ef6c32483e/5059435229031_cover.jpg/200x200bb.jpg',
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/be/c1/c1/bec1c1c1-182f-6dfb-f28b-f46d64cec422/mzaf_14069016237272833082.plus.aac.p.m4a'
+  {
+    id: 'notallowedtvgirl',
+    title: 'Not Allowed',
+    artist: 'TV Girl',
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/00/ac/93/00ac9300-92f7-503d-3b22-93d027779274/859716206028.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/53/93/b0/5393b0c4-f09f-a01b-a9b2-a24b87e069f1/mzaf_12007878714715764887.plus.aac.p.m4a',
+    dataAiHint: 'lofi indie',
   },
-  { 
-    id: 'tvoff', 
-    title: 'tv off (feat. Lefty Gunplay)', 
-    artist: 'Kendrick Lamar', 
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/50/c2/cc/50c2cc95-3658-9417-0d4b-831abde44ba1/24UM1IM28978.rgb.jpg/200x200bb.jpg',
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/40/c3/92/40c392db-07fa-9e30-eedb-d96ccd65cb89/mzaf_8483268782938498986.plus.aac.p.m4a'
+  {
+    id: 'machinelovejamiepage',
+    title: 'Machine Love',
+    artist: 'Jamie Page',
+    imageUrl: 'https://picsum.photos/200/200', // Placeholder, actual art is harder to find in standard format
+    previewUrl: null, // Preview URL is also hard to find
+    dataAiHint: 'synthwave retro',
   },
 ];
 
@@ -84,6 +89,7 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause })
             layout="fill"
             objectFit="cover"
             className="rounded-md"
+            data-ai-hint={song.dataAiHint}
           />
         </div>
         <div className="flex-grow">
