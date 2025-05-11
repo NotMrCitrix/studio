@@ -22,23 +22,43 @@ export default function Home() {
         } else {
           // If artwork is not intersecting, 'home' tab should be active.
           // This handles scrolling past artwork in both directions.
-          setActiveTab('home');
+          // Check if the home section is visible to set the tab correctly when scrolling up from artwork.
+          const homeSectionVisible = homeSectionRef.current && homeSectionRef.current.getBoundingClientRect().top >= 0 && homeSectionRef.current.getBoundingClientRect().bottom <= window.innerHeight;
+          if(homeSectionVisible || entry.boundingClientRect.top > 0) { // if scrolling up past artwork
+            setActiveTab('home');
+          }
         }
       },
       {
         threshold: 0.1, // 10% of artwork section visible to be considered active
-        // rootMargin can be used to adjust detection sensitivity, e.g., trigger earlier/later
-        // Example: rootMargin: "-10% 0px -10% 0px" would shrink the detection viewport by 10% top/bottom
       }
     );
 
+    const homeObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && artworkRef.current && artworkRef.current.getBoundingClientRect().top > window.innerHeight) {
+          setActiveTab('home');
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+
     if (artworkRef.current) {
       artworkObserver.observe(artworkRef.current);
+    }
+    if (homeSectionRef.current) {
+      homeObserver.observe(homeSectionRef.current);
     }
 
     return () => {
       if (artworkRef.current) {
         artworkObserver.unobserve(artworkRef.current);
+      }
+      if (homeSectionRef.current) {
+        homeObserver.unobserve(homeSectionRef.current);
       }
     };
   }, []);
@@ -60,8 +80,8 @@ export default function Home() {
           onCitriTabClick={scrollToArtwork}
         />
         
-        {/* Increased margin-top to ensure content isn't hidden by the sticky header. Adjust as needed based on header height. */}
-        <main className="mt-24 flex flex-col gap-12"> 
+        {/* Reduced margin-top to move content up */}
+        <main className="mt-20 flex flex-col gap-12"> 
           <div ref={homeSectionRef}>
             <ProfileSection />
           </div>
@@ -90,3 +110,4 @@ export default function Home() {
     </div>
   );
 }
+
