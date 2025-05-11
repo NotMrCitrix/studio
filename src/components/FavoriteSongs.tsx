@@ -45,7 +45,7 @@ const songs: Song[] = [
     id: 'machinelovejamiepage',
     title: 'Machine Love',
     artist: 'Jamie Page',
-    imageUrl: 'https://i1.sndcdn.com/artworks-000101830900-l9z2v7-t500x500.jpg', // Updated image
+    imageUrl: 'https://i1.sndcdn.com/artworks-000101830900-l9z2v7-t500x500.jpg',
     previewUrl: null, 
     dataAiHint: 'synthwave retro game-ost',
   },
@@ -54,10 +54,10 @@ const songs: Song[] = [
 interface SongCardProps {
   song: Song;
   playingSongId: string | null;
-  onPlayPause: (songId: string, audioRef: React.RefObject<HTMLAudioElement>) => void;
+  onPlayPauseToggle: (songId: string) => void;
 }
 
-const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause }) => {
+const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPauseToggle }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const isPlaying = playingSongId === song.id;
 
@@ -65,17 +65,28 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause })
     const audioElement = audioRef.current;
     if (audioElement) {
       if (isPlaying) {
-        audioElement.play().catch(error => console.error("Error playing audio:", error));
+        audioElement.play().catch(error => {
+          console.error(`Error playing '${song.title}': ${error.message}`, error);
+          // Optionally, if play fails, inform parent to reset playing state
+          // onPlayPauseToggle(null); // This might cause a loop if not handled carefully
+        });
       } else {
         audioElement.pause();
-        audioElement.currentTime = 0; // Reset audio to beginning when paused
+        // Check if seeking to avoid error when setting currentTime
+        if (!audioElement.seeking) {
+            try {
+                audioElement.currentTime = 0; 
+            } catch (e) {
+                console.warn(`Could not reset currentTime for ${song.title}: ${(e as Error).message}`);
+            }
+        }
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, song.title]); // song.title for console logging context
 
-  const handlePlayPause = () => {
+  const handlePlayButtonClick = () => {
     if (song.previewUrl) {
-      onPlayPause(song.id, audioRef);
+      onPlayPauseToggle(song.id);
     }
   };
   
@@ -106,7 +117,7 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause })
             variant="outline"
             size="sm"
             className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-            onClick={handlePlayPause}
+            onClick={handlePlayButtonClick}
           >
             {isPlaying ? <Pause size={16} className="mr-2" /> : <Play size={16} className="mr-2" />}
             {isPlaying ? 'Pause Preview' : 'Play Preview'}
@@ -124,36 +135,13 @@ const SongCard: React.FC<SongCardProps> = ({ song, playingSongId, onPlayPause })
 
 const FavoriteSongs: React.FC = () => {
   const [playingSongId, setPlayingSongId] = useState<string | null>(null);
-  const audioRefs = useRef<{[key: string]: React.RefObject<HTMLAudioElement>}>({});
 
-  const handlePlayPause = (songId: string, audioRef: React.RefObject<HTMLAudioElement>) => {
-    // Pause currently playing song if different
-    if (playingSongId && playingSongId !== songId) {
-      const currentAudioRef = audioRefs.current[playingSongId];
-      if (currentAudioRef?.current) {
-        currentAudioRef.current.pause();
-        currentAudioRef.current.currentTime = 0; // Reset previous song
-      }
-    }
-    
-    // Toggle play/pause for the clicked song
+  const handlePlayPauseToggle = (songId: string) => {
     if (playingSongId === songId) {
-      // If clicking the currently playing song, pause it
-      const currentAudioElement = audioRef.current;
-      if (currentAudioElement) {
-        currentAudioElement.pause();
-        currentAudioElement.currentTime = 0;
-      }
-      setPlayingSongId(null); 
+      setPlayingSongId(null); // If current playing song is clicked, stop it.
     } else {
-      // If clicking a new song, play it
-      const newAudioElement = audioRef.current;
-      if (newAudioElement) {
-        newAudioElement.play().catch(error => console.error("Error playing audio:", error));
-      }
-      setPlayingSongId(songId); 
+      setPlayingSongId(songId); // Else, play the new song.
     }
-    audioRefs.current[songId] = audioRef;
   };
 
   return (
@@ -163,7 +151,12 @@ const FavoriteSongs: React.FC = () => {
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {songs.map((song) => (
-          <SongCard key={song.id} song={song} playingSongId={playingSongId} onPlayPause={handlePlayPause} />
+          <SongCard 
+            key={song.id} 
+            song={song} 
+            playingSongId={playingSongId} 
+            onPlayPauseToggle={handlePlayPauseToggle} 
+          />
         ))}
       </div>
     </section>
