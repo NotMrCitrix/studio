@@ -18,12 +18,12 @@ interface Song {
 
 const songs: Song[] = [
   {
-    id: 'lovelikeyou',
-    title: 'Love Like You',
-    artist: 'Rebecca Sugar (Steven Universe)',
-    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a0/19/a9/a019a95f-92bb-8547-a721-b8757a90e400/859778520570.jpg/200x200bb.jpg',
-    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview112/v4/8c/37/e9/8c37e930-3a86-711a-1b93-93a4f7a662d2/mzaf_1271683509779878051.plus.aac.p.m4a',
-    dataAiHint: 'soundtrack emotional',
+    id: 'meanttobe',
+    title: 'Meant to Be',
+    artist: 'bbno$',
+    imageUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/51/c1/a0/51c1a014-5219-3769-9c53-283546a93604/075679758280.jpg/200x200bb.jpg',
+    previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/bb/69/fa/bb69fa77-f1d3-4620-608f-252f3f35c524/mzaf_13174075927173936759.plus.aac.p.m4a',
+    dataAiHint: 'hiphop rap',
   },
   {
     id: 'finelemondemon',
