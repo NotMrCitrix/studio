@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import type React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,7 +8,7 @@ const ProfileSection: React.FC = () => {
     <section className="py-12">
       <Card className="bg-transparent border-none shadow-none">
         <CardContent className="flex flex-col md:flex-row items-center gap-8 p-0">
-          <div className="relative w-40 h-40 md:w-48 md:h-48 transform scale-110 hover:scale-125 transition-transform duration-300">
+          <div className="relative w-48 h-48 md:w-56 md:h-56 transform scale-110 hover:scale-125 transition-transform duration-300">
             <Image
               src="https://files.strawcdn.com/straw/prGJyQBdcRXCKuYOTYCW.png"
               alt="MrCitrix Profile Picture"

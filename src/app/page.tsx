@@ -1,3 +1,4 @@
+
 'use client';
 import type React from 'react';
 import { useRef, useState, useEffect } from 'react';
@@ -83,7 +84,7 @@ export default function Home() {
         </main>
 
         <footer className="py-12 mt-16 text-center">
-          <p className="text-muted-foreground" style={{ fontFamily: 'VT323, monospace' }}>CitriPage by MrCitrix</p>
+          {/* Removed "CitriPage by MrCitrix" text */}
         </footer>
       </div>
     </div>
